@@ -3,28 +3,36 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import axios from 'axios'
+import { getPosts, getPost, createPost, updatePost, deletePost } from './api.js'
 
 function App() {
 
-  const[data, setData] =useState()
+  const[data, setPosts] =useState()
 
-  useEffect(() => {
-    async function grabData(){
-      const response = await axios.get('http://localhost:3000/posts');
-      if(response.status === 200){
-        setData(response.data)
-        console.log(response.data)
-      }
+/* function createpost() {
+    let postObject = {
+      title: "My first post",
+      description: "This is the body of my first post",
+      content: "12344",
+      author: "3333",
+      dateCreated: new Date()
     }
+    axios.post('http://localhost:3000/posts', postObject)
+  } */
 
-    grabData()
-
-
-  }, [])
+useEffect(() => {
+  async function loadAllPosts() {
+    let data = await getPosts()
+    if(data) {
+      setPosts(data)
+    }
+  }
+  loadAllPosts();
+}, [])
 
   return (
     <>
-      {JSON.stringify(data)}
+    {JSON.stringify(data)}  
     </>
   )
 }
