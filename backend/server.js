@@ -10,7 +10,11 @@ app.use(cors());
 app.use(express.json());
 app.use(posts);
 
-app.listen(PORT, () => {
-    connect.connectToServer();
-    console.log(`Server is running on port: ${PORT}`);
-})
+app.listen(PORT, async () => {
+    try {
+        await connect.connectToServer();
+        console.log(`Server is running on port: ${PORT}`);
+    } catch (error) {
+        console.error("Failed to connect to MongoDB:", error);
+    }
+});
