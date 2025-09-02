@@ -1,39 +1,39 @@
-import { useState, useEffect} from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
-import axios from 'axios'
-import { getPosts, getPost, createPost, updatePost, deletePost } from './api.js'
+import {HashRouter as Router, Route, Routes} from 'react-router-dom'
+import  {About} from './pages/About'
+import {Contact} from './pages/Contact'
+import {CreateBlog} from './pages/CreateBlog'
+import {Home} from './pages/Home'
+import {Landing} from './pages/Landing'
+import {Profile} from './pages/Profile'
+import {ReadBlog} from './pages/ReadBlog'
 
 function App() {
 
-  const[data, setPosts] =useState()
+  //pages
 
-/* function createpost() {
-    let postObject = {
-      title: "My first post",
-      description: "This is the body of my first post",
-      content: "12344",
-      author: "3333",
-      dateCreated: new Date()
-    }
-    axios.post('http://localhost:3000/posts', postObject)
-  } */
 
-useEffect(() => {
-  async function loadAllPosts() {
-    let data = await getPosts()
-    if(data) {
-      setPosts(data)
-    }
-  }
-  loadAllPosts();
-}, [])
-
+  //Landing OPage
+  //Home Page(Filtered by recency)
+  //ReadBlog Page
+  //CreateBlog Page
+  //Profile
+  //About
+  //Contact
+  
   return (
-    <>
-    {JSON.stringify(data)}  
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/createblog" element={<CreateBlog />} />
+        <Route path="/readblog" element={<ReadBlog />} />
+        <Route path="/profile" element={<Profile/>} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        
+      </Routes>
+    </ Router>
   )
 }
 
