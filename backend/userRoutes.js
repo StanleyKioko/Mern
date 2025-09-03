@@ -33,42 +33,42 @@ postRoutes.route("/users/:id").get(async (request, response) => {
             response.status(404).json({ message: "Post not found" });
         }
     } catch (error) {
-        console.error("Error retrieving post:", error);
+        console.error("Error retrieving user:", error);
         response.status(500).json({ error: error.message });
     }
 });
 
 //# 3- Create One
-postRoutes.route("/users").post(async (request, response) => {
+userRoutes.route("/users").user(async (request, response) => {
     try {
         let db = database.getDb();
         let mongoObject = {
-            title: request.body.title,
-            description: request.body.description,
-            content: request.body.content,
-            author: request.body.author,
-            dateCreated: request.body.dateCreated || new Date()
+            name: request.body.name,
+            email: request.body.email,
+            password: request.body.password,
+            joinDate: new Date(),
+            posts: []
         };
 
         let data = await db.collection("users").insertOne(mongoObject);
         response.status(201).json(data);
     } catch (error) {
-        console.error("Error creating post:", error);
+        console.error("Error creating user:", error);
         response.status(500).json({ error: error.message });
     }
 });
 
 //# 4- Update One
-postRoutes.route("/users/:id").put(async (request, response) => {
+userRoutes.route("/users/:id").put(async (request, response) => {
     try {
         let db = database.getDb();
         let mongoObject = {
             $set: {
-                title: request.body.title,
-                description: request.body.description,
-                content: request.body.content,
-                author: request.body.author,
-                dateCreated: request.body.dateCreated
+                name: request.body.name,
+                email: request.body.email,
+                password: request.body.password,
+                joinDate: request.body.joinDate,
+                posts: request.body.posts,
             }
         };
 
@@ -83,7 +83,7 @@ postRoutes.route("/users/:id").put(async (request, response) => {
         
         response.json(data);
     } catch (error) {
-        console.error("Error updating post:", error);
+        console.error("Error updating user:", error);
         response.status(500).json({ error: error.message });
     }
 });
@@ -100,7 +100,7 @@ userRoutes.route("/users/:id").delete(async (request, response) => {
         
         response.json(data);
     } catch (error) {
-        console.error("Error deleting post:", error);
+        console.error("Error deleting user:", error);
         response.status(500).json({ error: error.message });
     }
 });

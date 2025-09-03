@@ -59,3 +59,37 @@ export async function deletePost(id) {
         throw error;
     }
 }
+
+export async function getUser(id) {
+    try {
+        const response = await axios.get(`${URL}/users/${id}`);
+        if(response.status === 200){
+            return response.data;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error(`Error fetching user ${id}:`, error);
+        return null;
+    }
+}
+
+export async function createUser(user) {
+    try {
+        const response = await axios.post(`${URL}/users`, user);
+        return response;
+    } catch (error) {
+        console.error("Error creating user:", error);
+        throw error;
+    }
+}
+
+export async function updateUser(id, user) {
+    try {
+        const response = await axios.put(`${URL}/users/${id}`, user);
+        return response;
+    } catch (error) {
+        console.error(`Error updating user ${id}:`, error);
+        throw error;
+    }
+}
