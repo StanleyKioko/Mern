@@ -33,5 +33,7 @@ export function Profile() {
             <BlogCard post={post} />
            ))}
         </div>
-    )
+        )
+    
+    }
 
