@@ -1,8 +1,10 @@
 const express = require('express')
 const database = require('./connect');
 const { ObjectId } = require('mongodb').ObjectId
+const bcrypt = require('bcrypt');
 
 let postRoutes = express.Router()
+const SALT_ROUNDS = 6;
 
 // #1- Retrieve All
 //http://localhost:3000/users
@@ -42,16 +44,23 @@ postRoutes.route("/users/:id").get(async (request, response) => {
 userRoutes.route("/users").user(async (request, response) => {
     try {
         let db = database.getDb();
+
+        const takenEmail = db.collection("users").findOne({ email: request.body.email });
+        if (takenEmail) {
+            return response.json({ message: "Email already in use" });
+        } else {
+            const hash = await bcrypt.hash(request.body.password, SALT_ROUNDS);
         let mongoObject = {
             name: request.body.name,
             email: request.body.email,
-            password: request.body.password,
+            password: hash,
             joinDate: new Date(),
             posts: []
         };
 
         let data = await db.collection("users").insertOne(mongoObject);
         response.status(201).json(data);
+        }
     } catch (error) {
         console.error("Error creating user:", error);
         response.status(500).json({ error: error.message });
