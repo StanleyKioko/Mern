@@ -1,11 +1,15 @@
 import { useState } from "react"
 import { verifyUser } from "../api"
+import { useNavigate } from "react-router-dom"
 
 export function Login() {
     const [user, setUser] = useState({
         email: "",
         password: ""
     })
+
+    const navigate = useNavigate()
+
     function handleChange(e) {
         const { name, value } = e.target
         setUser({...user, [name]: value})
@@ -13,7 +17,11 @@ export function Login() {
     async function handleSubmit(e) {
         e.preventDefault();
         let response = await verifyUser(user)
-        console.log(response)
+        if(!response){
+        navigate("/home")
+        } else {
+            alert("Login failed")
+        }
         
     }
     return(
