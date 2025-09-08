@@ -49,7 +49,7 @@ postRoutes.route("/posts").post(VerifyToken, async (request, response) => {
             title: request.body.title,
             description: request.body.description,
             content: request.body.content,
-            author: request.body.author,
+            author: request.body.user._id,
             dateCreated: request.body.dateCreated || new Date()
         };
 
