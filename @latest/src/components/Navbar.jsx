@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 
 export function Navbar() {
     const navigate = useNavigate()
-    export function handlelogout() {
+    function handlelogout() {
         sessionStorage.removeItem("user")
         navigate("/")
     }
