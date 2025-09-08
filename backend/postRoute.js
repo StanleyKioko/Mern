@@ -1,12 +1,15 @@
 const express = require('express')
 const database = require('./connect');
 const { ObjectId } = require('mongodb').ObjectId
+const jwt = require('jsonwebtoken');
+const { error } = require('console');
+require('dotenv').config({ path: './config.env' });
 
 let postRoutes = express.Router()
 
 // #1- Retrieve All
 //http://localhost:3000/posts
-postRoutes.route("/posts").get(async (request, response) => {
+postRoutes.route("/posts").get(VerifyToken, async (request, response) => {
     try {
         let db = database.getDb();
         let data = await db.collection("posts").find({}).toArray();
@@ -23,7 +26,7 @@ postRoutes.route("/posts").get(async (request, response) => {
 
 //# 2- Retrieve One
 //http://localhost:3000/posts/12345
-postRoutes.route("/posts/:id").get(async (request, response) => {
+postRoutes.route("/posts/:id").get(VerifyToken, async (request, response) => {
     try {
         let db = database.getDb();
         let data = await db.collection("posts").findOne({ _id: new ObjectId(request.params.id) });
@@ -39,7 +42,7 @@ postRoutes.route("/posts/:id").get(async (request, response) => {
 });
 
 //# 3- Create One
-postRoutes.route("/posts").post(async (request, response) => {
+postRoutes.route("/posts").post(VerifyToken, async (request, response) => {
     try {
         let db = database.getDb();
         let mongoObject = {
@@ -59,7 +62,7 @@ postRoutes.route("/posts").post(async (request, response) => {
 });
 
 //# 4- Update One
-postRoutes.route("/posts/:id").put(async (request, response) => {
+postRoutes.route("/posts/:id").put(VerifyToken, async (request, response) => {
     try {
         let db = database.getDb();
         let mongoObject = {
@@ -89,7 +92,7 @@ postRoutes.route("/posts/:id").put(async (request, response) => {
 });
 
 //# 5- Delete One
-postRoutes.route("/posts/:id").delete(async (request, response) => {
+postRoutes.route("/posts/:id").delete(VerifyToken, async (request, response) => {
     try {
         let db = database.getDb();
         let data = await db.collection("posts").deleteOne({ _id: new ObjectId(request.params.id) });
@@ -104,5 +107,23 @@ postRoutes.route("/posts/:id").delete(async (request, response) => {
         response.status(500).json({ error: error.message });
     }
 });
+
+function VerifyToken(request, response, next) {
+    const authHeaders = request.headers['authorization'];
+    const token = authHeaders && authHeaders.split(' ')[1];
+    //Bearer 123456789
+    if (!token) {
+        return response.status(401).json({ message: "Authentication Token is missing" });
+    }
+
+    jwt.verify(token, process.env.SECRETKEY, (error, user) => {
+        if (error)
+            return response.status(403).json({ message: " Invalid Token" });
+    });
+
+    request.body.user = user;
+    next();
+
+}
 
 module.exports = postRoutes;

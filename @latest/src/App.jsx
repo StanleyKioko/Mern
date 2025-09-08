@@ -9,8 +9,18 @@ import { Profile } from './pages/Profile'
 import { ReadBlog } from './pages/ReadBlog'
 import { Layout } from './components/Layout'
 import { Navbar } from './components/Navbar'
+import  { useEffect } from 'react'
+import { axios } from 'axios'
 
 function App() {
+
+useEffect(() => {
+  let token = sessionStorage.getItem("user")
+  if(token){
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  }
+}, [])
+
   return (
     <Router>
       <Routes>
