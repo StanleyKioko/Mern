@@ -14,6 +14,7 @@ export function CreateUser() {
     async function handleSubmit(e) {
         e.preventDefault();
         let response = await createUser(user)
+        console.log(response)
         if(response.status !== 200){
             alert("User account creation failed")
             

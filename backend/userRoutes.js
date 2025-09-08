@@ -3,12 +3,17 @@ const database = require('./connect');
 const { ObjectId } = require('mongodb').ObjectId
 const bcrypt = require('bcrypt');
 
-let postRoutes = express.Router()
+const express = require('express')
+const database = require('./connect');
+const { ObjectId } = require('mongodb').ObjectId
+const bcrypt = require('bcrypt');
+
+const userRoutes = express.Router()
 const SALT_ROUNDS = 6;
 
 // #1- Retrieve All
 //http://localhost:3000/users
-postRoutes.route("/users").get(async (request, response) => {
+userRoutes.route("/users").get(async (request, response) => {
     try {
         let db = database.getDb();
         let data = await db.collection("users").find({}).toArray();
@@ -25,7 +30,7 @@ postRoutes.route("/users").get(async (request, response) => {
 
 //# 2- Retrieve One
 //http://localhost:3000/users/12345
-postRoutes.route("/users/:id").get(async (request, response) => {
+userRoutes.route("/users/:id").get(async (request, response) => {
     try {
         let db = database.getDb();
         let data = await db.collection("users").findOne({ _id: new ObjectId(request.params.id) });
@@ -41,26 +46,26 @@ postRoutes.route("/users/:id").get(async (request, response) => {
 });
 
 //# 3- Create One
-userRoutes.route("/users").user(async (request, response) => {
+userRoutes.route("/users").post(async (request, response) => {
     try {
         let db = database.getDb();
 
         const takenEmail = await db.collection("users").findOne({ email: request.body.email });
         if (takenEmail) {
-            return response.json({ message: "Email already in use" });
-        } else {
-            const hash = await bcrypt.hash(request.body.password, SALT_ROUNDS);
-        let mongoObject = {
+            return response.status(400).json({ message: "Email already taken" });
+        }
+
+        const hashedPassword = await bcrypt.hash(request.body.password, SALT_ROUNDS);
+        let newUser = {
             name: request.body.name,
             email: request.body.email,
-            password: hash,
-            joinDate: new Date(),
-            posts: []
+            password: hashedPassword,
+            joinDate: request.body.joinDate,
+            posts: request.body.posts || []
         };
 
-        let data = await db.collection("users").insertOne(mongoObject);
-        response.status(201).json(data);
-        }
+        let result = await db.collection("users").insertOne(newUser);
+        response.status(201).json(result);
     } catch (error) {
         console.error("Error creating user:", error);
         response.status(500).json({ error: error.message });
@@ -114,4 +119,27 @@ userRoutes.route("/users/:id").delete(async (request, response) => {
     }
 });
 
-module.exports = postRoutes;
+//# 6- login
+userRoutes.route("/users/login").post(async (request, response) => {
+    try {
+        let db = database.getDb();
+
+        const user = await db.collection("users").findOne({ email: request.body.email });
+        if (user) {
+            let confirmation = await bcrypt.compare(request.body.password, user.password);
+            if (confirmation) {
+                response.json({success: true, user})
+            } else {
+                response.json({success: false, message: "Incorrect password"})
+            }
+
+        }else {
+            response.json({success: false, message: "User not found"})
+        }
+    } catch (error) {
+        console.error("Error logging in:", error);
+        response.status(500).json({ error: error.message });
+    }
+});
+
+module.exports = userRoutes;
