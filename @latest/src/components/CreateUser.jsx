@@ -11,7 +11,8 @@ export function CreateUser() {
         const { name, value } = e.target
         setUser({...user, [name]: value})
     }
-    async function handleSubmit() {
+    async function handleSubmit(e) {
+        e.preventDefault();
         let response = await createUser(user)
         if(response.status !== 200){
             alert("User account creation failed")
@@ -22,7 +23,7 @@ export function CreateUser() {
         <form onSubmit={handleSubmit}>
             <input placeholder="{Name}" onChange={handleChange} name="name" value={user.name} required maxLength={20} />
             <input placeholder="{Email}" onChange={handleChange} name="email" value={user.email} required maxLength={50} />
-            <input placeholder="{Password}" onChange={handleChange} name="password" value={user.password} required maxLength={100} />
+            <input placeholder="{Password}" onChange={handleChange} name="password" value={user.password} type="password" required maxLength={100} />
             <button type="submit">Create Account</button>
         </form>
 

@@ -45,7 +45,7 @@ userRoutes.route("/users").user(async (request, response) => {
     try {
         let db = database.getDb();
 
-        const takenEmail = db.collection("users").findOne({ email: request.body.email });
+        const takenEmail = await db.collection("users").findOne({ email: request.body.email });
         if (takenEmail) {
             return response.json({ message: "Email already in use" });
         } else {
